@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:path/path.dart" as p;
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
+// ignore: depend_on_referenced_packages
 import 'package:sqlite3/sqlite3.dart';
 
 part 'app_database.g.dart';
@@ -14,11 +15,43 @@ final appDatabaseProvider = Provider((ref) => AppDatabase());
 
 class Vaults extends Table {
   TextColumn get id => text()();
-  TextColumn get title => text().withLength(min: 6, max: 32)();
-  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get title => text()();
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(Constant(DateTime.now()))();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Vaults])
+class Folders extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get vaultId => text().references(Vaults, #id)();
+  TextColumn get parentId => text().nullable().references(Folders, #id)();
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(Constant(DateTime.now()))();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class Notes extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get content => text()();
+  TextColumn get vaultId => text().references(Vaults, #id)();
+  TextColumn get folderId => text().nullable().references(Folders, #id)();
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(Constant(DateTime.now()))();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [Vaults, Folders, Notes])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -32,7 +65,7 @@ LazyDatabase _openConnection() {
     // put the database file, called db.sqlite here, into the documents folder
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'test_1.sqlite'));
+    final file = File(p.join(dbFolder.path, 'arcane.sqlite'));
 
     // Also work around limitations on old Android versions
     if (Platform.isAndroid) {

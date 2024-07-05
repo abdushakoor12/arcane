@@ -36,9 +36,7 @@ class WelcomeScreen extends HookConsumerWidget {
 
                   final database = ref.read(appDatabaseProvider);
                   database.into(database.vaults).insert(VaultsCompanion.insert(
-                      title: value,
-                      id: const Uuid().v1(),
-                      createdAt: DateTime.now()));
+                      title: value, id: const Uuid().v1()));
 
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
