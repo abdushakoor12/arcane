@@ -10,6 +10,9 @@
 .svn/
 migrate_working_dir/
 
+# Generated code files
+*.g.dart
+
 # IntelliJ related
 *.iml
 *.ipr
