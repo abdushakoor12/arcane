@@ -1,4 +1,5 @@
 import 'package:arcane/database/app_database.dart';
+import 'package:arcane/database/daos/vault_dao.dart';
 import 'package:arcane/ui/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -34,16 +35,15 @@ class WelcomeScreen extends HookConsumerWidget {
                 onSubmitted: (value) {
                   if (value.trim().isEmpty) return;
 
-                  final database = ref.read(appDatabaseProvider);
-                  database.into(database.vaults).insert(VaultsCompanion.insert(
-                      title: value, id: const Uuid().v1()));
-
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
-                    ),
-                    (route) => false,
-                  );
+                  final vaultsDao = ref.read(vaultsDaoProvider);
+                  vaultsDao.insertVault(value).then((_) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  });
                 },
                 decoration: const InputDecoration(
                   labelText: 'Vault Name',

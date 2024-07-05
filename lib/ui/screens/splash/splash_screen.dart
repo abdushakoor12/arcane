@@ -1,4 +1,5 @@
 import 'package:arcane/database/app_database.dart';
+import 'package:arcane/database/daos/vault_dao.dart';
 import 'package:arcane/ui/screens/home/home_screen.dart';
 import 'package:arcane/ui/screens/welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +17,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(seconds: 1), () {
-      final database = ref.read(appDatabaseProvider);
-      database.select(database.vaults).get().then((vaults) {
+    Future.microtask(() {
+      final vaultsDao = ref.read(vaultsDaoProvider);
+      vaultsDao.getAllVaults().then((vaults) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) =>
                 vaults.isEmpty ? const WelcomeScreen() : const HomeScreen()));
