@@ -1,4 +1,5 @@
 import 'package:arcane/ui/screens/splash/splash_screen.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -13,10 +14,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Arcane',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: FlexThemeData.light(scheme: FlexScheme.tealM3),
+      // The Mandy red, dark theme.
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.tealM3),
+      // Use dark or light theme based on system setting.
+      themeMode: ThemeMode.light,
       home: const SplashScreen(),
     );
   }
