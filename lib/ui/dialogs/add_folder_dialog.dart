@@ -1,3 +1,4 @@
+import 'package:arcane/database/app_database.dart';
 import 'package:arcane/database/daos/folder_dao.dart';
 import 'package:arcane/database/daos/vault_dao.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class AddFolderDialog extends HookConsumerWidget {
-  const AddFolderDialog({super.key});
+  final Folder? parentFolder;
+  const AddFolderDialog({super.key, this.parentFolder});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,7 +21,7 @@ class AddFolderDialog extends HookConsumerWidget {
       if (folderName.isNotEmpty) {
         ref
             .read(folderDaoProvider)
-            .insertFolder(currentVault, folderName)
+            .insertFolder(currentVault, folderName, parentFolder: parentFolder)
             .then((_) => Navigator.of(context).pop());
       }
     }

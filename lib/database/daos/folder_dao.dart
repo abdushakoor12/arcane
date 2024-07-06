@@ -1,5 +1,6 @@
 import 'package:arcane/database/app_database.dart';
 import 'package:arcane/database/utils/unique_id.dart';
+import 'package:drift/drift.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final folderDaoProvider =
@@ -10,10 +11,15 @@ class FolderDao {
 
   FolderDao(this._appDatabase);
 
-  Future<int> insertFolder(Vault vault, String title) {
+  Future<int> insertFolder(Vault vault, String title, {Folder? parentFolder}) {
     return _appDatabase.into(_appDatabase.folders).insert(
-        FoldersCompanion.insert(
-            id: getUniqueId(), title: title, vaultId: vault.id));
+          FoldersCompanion.insert(
+            id: getUniqueId(),
+            title: title,
+            vaultId: vault.id,
+            parentId: Value.absentIfNull(parentFolder?.id),
+          ),
+        );
   }
 
   Stream<List<Folder>> watchFolders(Vault vault) {

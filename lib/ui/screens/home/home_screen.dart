@@ -58,10 +58,17 @@ class HomeScreen extends ConsumerWidget {
                           MediaQuery.of(context).size.width - offset.dx,
                           MediaQuery.of(context).size.height - offset.dy,
                         );
-                        final p = showMenu(
+                        showMenu(
                           context: context,
                           position: position,
                           items: [
+                            PopupMenuItem(
+                              onTap: () => showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      AddFolderDialog(parentFolder: folder)),
+                              child: const Text('New Folder'),
+                            ),
                             PopupMenuItem(
                               onTap: () => ref
                                   .read(folderDaoProvider)
