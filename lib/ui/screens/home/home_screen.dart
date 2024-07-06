@@ -46,13 +46,49 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 Expanded(
-                    child: ListView.builder(
+                    child: ListView.separated(
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(allFolders[index].title),
+                    final folder = allFolders[index];
+                    return GestureDetector(
+                      onSecondaryTapUp: (details) {
+                        final offset = details.globalPosition;
+                        final position = RelativeRect.fromLTRB(
+                          offset.dx,
+                          offset.dy,
+                          MediaQuery.of(context).size.width - offset.dx,
+                          MediaQuery.of(context).size.height - offset.dy,
+                        );
+                        final p = showMenu(
+                          context: context,
+                          position: position,
+                          items: [
+                            PopupMenuItem(
+                              onTap: () => ref
+                                  .read(folderDaoProvider)
+                                  .deleteFolder(folder),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Text(folder.title),
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   },
                   itemCount: allFolders.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const Divider(
+                      height: 1,
+                    );
+                  },
                 )),
               ],
             ),

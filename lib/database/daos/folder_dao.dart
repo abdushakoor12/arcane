@@ -21,4 +21,8 @@ class FolderDao {
           ..where((t) => t.vaultId.equals(vault.id)))
         .watch();
   }
+
+  Future<int> deleteFolder(Folder folder) {
+    return _appDatabase.delete(_appDatabase.folders).delete(folder);
+  }
 }
