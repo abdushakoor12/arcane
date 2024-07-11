@@ -50,7 +50,10 @@ class HomeScreen extends ConsumerWidget {
                     child: ListView.separated(
                   itemBuilder: (context, index) {
                     final folderTree = folderNodes[index];
-                    return FolderTreeView(folderNode: folderTree);
+                    return FolderTreeView(
+                      folderNode: folderTree,
+                      key: ValueKey(folderTree.folder.id),
+                    );
                   },
                   itemCount: folderNodes.length,
                   separatorBuilder: (BuildContext context, int index) {
@@ -69,6 +72,23 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
+final expandedFolderIdsProvider =
+    ChangeNotifierProvider((ref) => ExpandedFolderIdsNotifier());
+
+class ExpandedFolderIdsNotifier extends ChangeNotifier {
+  final list = <String>[];
+
+  void toggleFolder(String folderId) {
+    if (list.contains(folderId)) {
+      list.remove(folderId);
+    } else {
+      list.add(folderId);
+    }
+
+    notifyListeners();
+  }
+}
+
 class FolderTreeView extends ConsumerWidget {
   final FolderNode folderNode;
   const FolderTreeView({super.key, required this.folderNode});
@@ -76,9 +96,14 @@ class FolderTreeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final folder = folderNode.folder;
+    final expandedList = ref.watch(expandedFolderIdsProvider);
+    final expanded = expandedList.list.contains(folder.id);
     return Column(
       children: [
         GestureDetector(
+          onTapUp: (details) {
+            ref.read(expandedFolderIdsProvider).toggleFolder(folder.id);
+          },
           onSecondaryTapUp: (details) {
             final offset = details.globalPosition;
             final position = RelativeRect.fromLTRB(
@@ -114,17 +139,25 @@ class FolderTreeView extends ConsumerWidget {
                   child: Text(folder.title),
                 ),
               ),
+              if (folderNode.children.isNotEmpty)
+                Icon(
+                  expanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                ),
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0),
-          child: Column(
-            children: folderNode.children
-                .map((child) => FolderTreeView(folderNode: child))
-                .toList(),
+        if (expanded)
+          Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: Column(
+              children: folderNode.children
+                  .map((child) => FolderTreeView(
+                        folderNode: child,
+                        key: ValueKey(child.folder.id),
+                      ))
+                  .toList(),
+            ),
           ),
-        ),
       ],
     );
   }
