@@ -1,4 +1,3 @@
-import 'package:arcane/database/app_database.dart';
 import 'package:arcane/database/daos/vault_dao.dart';
 import 'package:arcane/ui/screens/home/home_screen.dart';
 import 'package:arcane/ui/screens/welcome/welcome_screen.dart';

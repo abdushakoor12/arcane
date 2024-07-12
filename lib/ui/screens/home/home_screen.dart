@@ -18,7 +18,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentVaultValue = ref.watch(currentVaultProvider);
     final allFolders =
         ref.watch(currentVaultFoldersProvider).asData?.value ?? [];
     final folderNodes = buildFolderNodes(allFolders);
