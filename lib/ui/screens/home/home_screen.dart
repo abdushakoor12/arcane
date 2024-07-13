@@ -1,7 +1,9 @@
+import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:arcane/database/app_database.dart';
 import 'package:arcane/database/daos/folder_dao.dart';
 import 'package:arcane/database/daos/vault_dao.dart';
 import 'package:arcane/ui/dialogs/add_folder_dialog.dart';
+import 'package:arcane/ui/screens/home/home_screen_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -21,6 +23,9 @@ class HomeScreen extends ConsumerWidget {
     final allFolders =
         ref.watch(currentVaultFoldersProvider).asData?.value ?? [];
     final folderNodes = buildFolderNodes(allFolders);
+    final expandedFoldersCount = ref.watch(
+        homeScreenNotifierProvider.select((e) => e.expandedFolderIds.length));
+    print(expandedFoldersCount);
     return Scaffold(
       body: Row(
         children: [
@@ -41,7 +46,16 @@ class HomeScreen extends ConsumerWidget {
                           },
                           icon: const Icon(
                             Icons.create_new_folder,
-                          ))
+                          )),
+                      // IconButton(
+                      //     onPressed: () {
+
+                      //     },
+                      //     icon: Icon(
+                      //       expandedFoldersCount > 0
+                      //           ? Icons.unfold_more
+                      //           : Icons.unfold_less,
+                      //     )),
                     ],
                   ),
                 ),
@@ -71,23 +85,6 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-final expandedFolderIdsProvider =
-    ChangeNotifierProvider((ref) => ExpandedFolderIdsNotifier());
-
-class ExpandedFolderIdsNotifier extends ChangeNotifier {
-  final list = <String>[];
-
-  void toggleFolder(String folderId) {
-    if (list.contains(folderId)) {
-      list.remove(folderId);
-    } else {
-      list.add(folderId);
-    }
-
-    notifyListeners();
-  }
-}
-
 class FolderTreeView extends ConsumerWidget {
   final FolderNode folderNode;
   const FolderTreeView({super.key, required this.folderNode});
@@ -95,13 +92,16 @@ class FolderTreeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final folder = folderNode.folder;
-    final expandedList = ref.watch(expandedFolderIdsProvider);
-    final expanded = expandedList.list.contains(folder.id);
+    final expandedList =
+        ref.watch(homeScreenNotifierProvider).expandedFolderIds;
+    final expanded = expandedList.contains(folder.id);
     return Column(
       children: [
         GestureDetector(
           onTapUp: (details) {
-            ref.read(expandedFolderIdsProvider).toggleFolder(folder.id);
+            ref
+                .read(homeScreenNotifierProvider.notifier)
+                .toggleFolder(folder.id);
           },
           onSecondaryTapUp: (details) {
             final offset = details.globalPosition;
